@@ -60,28 +60,10 @@ module testDeployment '../../../main.bicep' = [
         location: resourceLocation 
         virtualHubResourceId: nestedDependencies.outputs.virtualHubResourceId 
         vpnGatewayScaleUnit: 1 
-        bgpSettings: { 
-            asn: 65515 
-            peerWeight: 0 
-            bgpPeeringAddresses: [ 
-                { ipconfigurationId: 'Instance0' 
-                  defaultBgpIpAddresses: ['172.30.0.12'] 
-                  customBgpIpAddresses: ['169.254.21.1'] 
-                  tunnelIpAddresses: [ 
-                      '20.84.35.53'
-                      '172.30.0.20' 
-                  ]
-               } 
-               { ipconfigurationId: 'Instance1' 
-                 defaultBgpIpAddresses: ['172.30.0.13'] 
-                 customBgpIpAddresses: ['169.254.22.1'] 
-                 tunnelIpAddresses: [ 
-                    '20.84.34.225'
-                    '172.30.0.21' 
-                  ] 
-                } 
-            ] 
-        }  
+        bgpSettings: {
+          asn: 65515
+          peerWeight: 0
+        } 
       } 
       dependsOn: [ 
         nestedDependencies 
