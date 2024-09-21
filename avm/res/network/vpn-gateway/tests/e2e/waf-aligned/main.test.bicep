@@ -31,16 +31,16 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: resourceLocation
 }
 
-module nestedDependencies 'dependencies.bicep' = {
-  scope: resourceGroup
-  name: '${uniqueString(deployment().name, resourceLocation)}-nestedDependencies'
-  params: {
-    location: resourceLocation
-    virtualHubName: 'dep-${namePrefix}-vh-${serviceShort}'
-    virtualWANName: 'dep-${namePrefix}-vw-${serviceShort}'
-    vpnSiteName: 'dep-${namePrefix}-vs-${serviceShort}'
-  }
-}
+// module nestedDependencies 'dependencies.bicep' = {
+//   scope: resourceGroup
+//   name: '${uniqueString(deployment().name, resourceLocation)}-nestedDependencies'
+//   params: {
+//     location: resourceLocation
+//     virtualHubName: 'dep-${namePrefix}-vh-${serviceShort}'
+//     virtualWANName: 'dep-${namePrefix}-vw-${serviceShort}'
+//     vpnSiteName: 'dep-${namePrefix}-vs-${serviceShort}'
+//   }
+// }
 
 // ============== //
 // Test Execution //
