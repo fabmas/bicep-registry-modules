@@ -22,27 +22,23 @@ resource virtualHub 'Microsoft.Network/virtualHubs@2022-01-01' = {
     virtualWan: {
       id: virtualWan.id
     }
-    addressPrefix: '10.1.0.0/16'
+    addressPrefix: '10.0.0.0/24'
   }
 }
 
-resource vpnSite 'Microsoft.Network/vpnSites@2024-01-01' = {
+resource vpnSite 'Microsoft.Network/vpnSites@2023-04-01' = {
   name: vpnSiteName
   location: location
   properties: {
     virtualWan: {
       id: virtualWan.id
     }
-    deviceProperties: {
-      deviceVendor: 'Cisco'
-      deviceModel: 'ASA 5500'
-      linkSpeedInMbps: 100
+    addressSpace: {
+      addressPrefixes: [
+        '10.1.0.0/16'
+      ]
     }
-    vpnSiteLinks: [
-      {
-        name: 'link1'        
-      }
-    ]
+    ipAddress: '10.1.0.0'
   }
 }
 
