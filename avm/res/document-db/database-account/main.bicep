@@ -14,7 +14,7 @@ param tags object?
 @description('Optional. The managed identity definition for this resource.')
 param managedIdentities managedIdentitiesType
 
-@description('Optional. Default to Standard. The offer type for the Cosmos DB database account.')
+@description('Optional. Default to Standard. The offer type for the Azure Cosmos DB database account.')
 @allowed([
   'Standard'
 ])
@@ -84,6 +84,9 @@ param mongodbDatabases array = []
 
 @description('Optional. Gremlin Databases configurations.')
 param gremlinDatabases array = []
+
+@description('Optional. Table configurations.')
+param tables array = []
 
 @description('Optional. Enable/Disable usage telemetry for module.')
 param enableTelemetry bool = true
@@ -257,9 +260,9 @@ var databaseAccountProperties = union(
     backupPolicy: backupPolicy
     minimalTlsVersion: minimumTlsVersion
   },
-  ((!empty(sqlDatabases) || !empty(mongodbDatabases) || !empty(gremlinDatabases))
+  ((!empty(sqlDatabases) || !empty(mongodbDatabases) || !empty(gremlinDatabases) || !empty(tables))
     ? {
-        // NoSQL, MongoDB RU, and Apache Gremlin common properties
+        // NoSQL, MongoDB RU, Table, and Apache Gremlin common properties
         consistencyPolicy: consistencyPolicy[defaultConsistencyLevel]
         enableMultipleWriteLocations: enableMultipleWriteLocations
         locations: empty(databaseAccount_locations) ? defaultFailoverLocation : databaseAccount_locations
@@ -276,9 +279,9 @@ var databaseAccountProperties = union(
         enableAnalyticalStorage: enableAnalyticalStorage
       }
     : {}),
-  (!empty(sqlDatabases)
+  ((!empty(sqlDatabases) || !empty(tables))
     ? {
-        // NoSQL properties
+        // NoSQL and Table properties
         disableLocalAuth: disableLocalAuth
         disableKeyBasedMetadataWriteAccess: disableKeyBasedMetadataWriteAccess
       }
@@ -472,6 +475,19 @@ module databaseAccount_gremlinDatabases 'gremlin-database/main.bicep' = [
       graphs: gremlinDatabase.?graphs
       maxThroughput: gremlinDatabase.?maxThroughput
       throughput: gremlinDatabase.?throughput
+    }
+  }
+]
+
+module databaseAccount_tables 'table/main.bicep' = [
+  for table in tables: {
+    name: '${uniqueString(deployment().name, location)}-table-${table.name}'
+    params: {
+      databaseAccountName: databaseAccount.name
+      name: table.name
+      tags: table.?tags ?? tags
+      maxThroughput: table.?maxThroughput
+      throughput: table.?throughput
     }
   }
 ]
