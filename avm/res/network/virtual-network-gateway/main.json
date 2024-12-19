@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.30.23.60470",
-      "templateHash": "1499507825797406827"
+      "version": "0.32.4.45862",
+      "templateHash": "3980934215118587563"
     },
     "name": "Virtual Network Gateways",
     "description": "This module deploys a Virtual Network Gateway.",
@@ -617,6 +617,17 @@
       "metadata": {
         "description": "Optional. Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided."
       }
+    },
+    "resiliencyModel": {
+      "type": "string",
+      "defaultValue": "SingleHomed",
+      "allowedValues": [
+        "SingleHomed",
+        "MultiHomed"
+      ],
+      "metadata": {
+        "description": "Optional. Property to indicate if the Express Route Gateway has resiliency model of MultiHomed or SingleHomed."
+      }
     }
   },
   "variables": {
@@ -670,7 +681,7 @@
     },
     "virtualNetworkGateway": {
       "type": "Microsoft.Network/virtualNetworkGateways",
-      "apiVersion": "2023-04-01",
+      "apiVersion": "2024-05-01",
       "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
@@ -693,7 +704,8 @@
         },
         "vpnType": "[variables('vpnTypeVar')]",
         "vpnClientConfiguration": "[if(not(empty(parameters('vpnClientAddressPoolPrefix'))), variables('vpnClientConfiguration'), null())]",
-        "vpnGatewayGeneration": "[if(equals(parameters('gatewayType'), 'Vpn'), parameters('vpnGatewayGeneration'), 'None')]"
+        "vpnGatewayGeneration": "[if(equals(parameters('gatewayType'), 'Vpn'), parameters('vpnGatewayGeneration'), 'None')]",
+        "resiliencyModel": "[if(not(variables('isExpressRoute')), parameters('resiliencyModel'), null())]"
       },
       "dependsOn": [
         "publicIPAddress"
@@ -1482,8 +1494,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.23.60470",
-              "templateHash": "15500017864202979057"
+              "version": "0.32.4.45862",
+              "templateHash": "2235037112727909278"
             },
             "name": "VPN Gateway NAT Rules",
             "description": "This module deploys a Virtual Network Gateway NAT Rule.",
@@ -1626,7 +1638,7 @@
       "metadata": {
         "description": "The location the resource was deployed into."
       },
-      "value": "[reference('virtualNetworkGateway', '2023-04-01', 'full').location]"
+      "value": "[reference('virtualNetworkGateway', '2024-05-01', 'full').location]"
     }
   }
 }
