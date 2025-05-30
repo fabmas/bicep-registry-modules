@@ -26,7 +26,7 @@ param namePrefix string = '#_namePrefix_#'
 
 // General resources
 // =================
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: resourceGroupName
   location: resourceLocation
 }
@@ -38,6 +38,8 @@ module nestedDependencies 'dependencies.bicep' = {
     managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
     storageAccountName: 'dep${namePrefix}sa${serviceShort}'
     storageQueueName: 'dep${namePrefix}sq${serviceShort}'
+    serviceBusNamespaceName: 'dep${namePrefix}sb${serviceShort}'
+    serviceBusTopicName: 'dep${namePrefix}sbt${serviceShort}'
     location: resourceLocation
   }
 }
@@ -88,6 +90,27 @@ module testDeployment '../../../main.bicep' = [
               resourceId: nestedDependencies.outputs.storageAccountResourceId
               queueMessageTimeToLiveInSeconds: 86400
               queueName: nestedDependencies.outputs.queueName
+            }
+          }
+        }
+        {
+          name: '${namePrefix}${serviceShort}002-managedidentity'
+          filter: {
+            subjectBeginsWith: '/blobServices/default/containers/'
+            subjectEndsWith: '.txt'
+          }
+          eventDeliverySchema: 'EventGridSchema'
+          deliveryWithResourceIdentity: {
+            identity: {
+              type: 'UserAssigned'
+              userAssignedIdentity: nestedDependencies.outputs.managedIdentityResourceId
+            }
+            destination: {
+              endpointType: 'ServiceBusTopic'
+              properties: {
+                resourceId: nestedDependencies.outputs.serviceBusNamespaceResourceId
+                topicName: nestedDependencies.outputs.serviceBusTopicName
+              }
             }
           }
         }

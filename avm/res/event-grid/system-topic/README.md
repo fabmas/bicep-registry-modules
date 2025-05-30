@@ -17,8 +17,8 @@ This module deploys an Event Grid System Topic.
 | :-- | :-- |
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
-| `Microsoft.EventGrid/systemTopics` | [2023-12-15-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.EventGrid/2023-12-15-preview/systemTopics) |
-| `Microsoft.EventGrid/systemTopics/eventSubscriptions` | [2023-12-15-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.EventGrid/2023-12-15-preview/systemTopics/eventSubscriptions) |
+| `Microsoft.EventGrid/systemTopics` | [2025-02-15](https://learn.microsoft.com/en-us/azure/templates/Microsoft.EventGrid/2025-02-15/systemTopics) |
+| `Microsoft.EventGrid/systemTopics/eventSubscriptions` | [2025-02-15](https://learn.microsoft.com/en-us/azure/templates/Microsoft.EventGrid/2025-02-15/systemTopics/eventSubscriptions) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
 
 ## Usage examples
@@ -161,6 +161,27 @@ module systemTopic 'br/public:avm/res/event-grid/system-topic:<version>' = {
           maxDeliveryAttempts: 10
         }
       }
+      {
+        deliveryWithResourceIdentity: {
+          destination: {
+            endpointType: 'ServiceBusTopic'
+            properties: {
+              resourceId: '<resourceId>'
+              topicName: '<topicName>'
+            }
+          }
+          identity: {
+            type: 'UserAssigned'
+            userAssignedIdentity: '<userAssignedIdentity>'
+          }
+        }
+        eventDeliverySchema: 'EventGridSchema'
+        filter: {
+          subjectBeginsWith: '/blobServices/default/containers/'
+          subjectEndsWith: '.txt'
+        }
+        name: 'egstmax002-managedidentity'
+      }
     ]
     location: '<location>'
     lock: {
@@ -259,6 +280,27 @@ module systemTopic 'br/public:avm/res/event-grid/system-topic:<version>' = {
             "eventTimeToLive": "120",
             "maxDeliveryAttempts": 10
           }
+        },
+        {
+          "deliveryWithResourceIdentity": {
+            "destination": {
+              "endpointType": "ServiceBusTopic",
+              "properties": {
+                "resourceId": "<resourceId>",
+                "topicName": "<topicName>"
+              }
+            },
+            "identity": {
+              "type": "UserAssigned",
+              "userAssignedIdentity": "<userAssignedIdentity>"
+            }
+          },
+          "eventDeliverySchema": "EventGridSchema",
+          "filter": {
+            "subjectBeginsWith": "/blobServices/default/containers/",
+            "subjectEndsWith": ".txt"
+          },
+          "name": "egstmax002-managedidentity"
         }
       ]
     },
@@ -358,6 +400,27 @@ param eventSubscriptions = [
       eventTimeToLive: '120'
       maxDeliveryAttempts: 10
     }
+  }
+  {
+    deliveryWithResourceIdentity: {
+      destination: {
+        endpointType: 'ServiceBusTopic'
+        properties: {
+          resourceId: '<resourceId>'
+          topicName: '<topicName>'
+        }
+      }
+      identity: {
+        type: 'UserAssigned'
+        userAssignedIdentity: '<userAssignedIdentity>'
+      }
+    }
+    eventDeliverySchema: 'EventGridSchema'
+    filter: {
+      subjectBeginsWith: '/blobServices/default/containers/'
+      subjectEndsWith: '.txt'
+    }
+    name: 'egstmax002-managedidentity'
   }
 ]
 param location = '<location>'

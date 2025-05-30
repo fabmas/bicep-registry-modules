@@ -10,12 +10,18 @@ param storageAccountName string
 @description('Required. The name of the Storage Queue to create.')
 param storageQueueName string
 
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+@description('Required. The name of the Service Bus Namespace to create.')
+param serviceBusNamespaceName string
+
+@description('Required. The name of the Service Bus Topic to create.')
+param serviceBusTopicName string
+
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
   name: managedIdentityName
   location: location
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
   name: storageAccountName
   location: location
   sku: {
@@ -23,12 +29,38 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
   kind: 'StorageV2'
 
-  resource queueService 'queueServices@2022-09-01' = {
+  resource queueService 'queueServices@2024-01-01' = {
     name: 'default'
 
-    resource queue 'queues@2022-09-01' = {
+    resource queue 'queues@2024-01-01' = {
       name: storageQueueName
     }
+  }
+}
+
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
+  name: serviceBusNamespaceName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+
+  resource topic 'topics@2024-01-01' = {
+    name: serviceBusTopicName
+    properties: {
+      enablePartitioning: false
+    }
+  }
+}
+
+// Give the managed identity permission to send messages to Service Bus
+resource serviceBusDataSenderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(serviceBusNamespace.id, managedIdentity.id, 'ServiceBusDataSender')
+  scope: serviceBusNamespace
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39') // Azure Service Bus Data Sender
+    principalId: managedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -40,3 +72,12 @@ output managedIdentityPrincipalId string = managedIdentity.properties.principalI
 
 @description('The resource ID of the created Storage Account.')
 output storageAccountResourceId string = storageAccount.id
+
+@description('The resource ID of the created Service Bus Namespace.')
+output serviceBusNamespaceResourceId string = serviceBusNamespace.id
+
+@description('The name of the created Service Bus Topic.')
+output serviceBusTopicName string = serviceBusNamespace::topic.name
+
+@description('The resource ID of the created Managed Identity.')
+output managedIdentityResourceId string = managedIdentity.id
