@@ -8,16 +8,16 @@ param name string
 param systemTopicName string
 
 @description('Optional. Dead Letter Destination. (See https://learn.microsoft.com/en-us/azure/templates/microsoft.eventgrid/eventsubscriptions?pivots=deployment-language-bicep#deadletterdestination-objects for more information).')
-param deadLetterDestination object?
+param deadLetterDestination resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.deadLetterDestination?
 
 @description('Optional. Dead Letter with Resource Identity Configuration. (See https://learn.microsoft.com/en-us/azure/templates/microsoft.eventgrid/eventsubscriptions?pivots=deployment-language-bicep#deadletterwithresourceidentity-objects for more information).')
-param deadLetterWithResourceIdentity object?
+param deadLetterWithResourceIdentity resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.deadLetterWithResourceIdentity?
 
 @description('Optional. Delivery with Resource Identity Configuration. (See https://learn.microsoft.com/en-us/azure/templates/microsoft.eventgrid/eventsubscriptions?pivots=deployment-language-bicep#deliverywithresourceidentity-objects for more information).')
-param deliveryWithResourceIdentity object?
+param deliveryWithResourceIdentity resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.deliveryWithResourceIdentity?
 
 @description('Conditional. The destination for the event subscription. Required if deliveryWithResourceIdentity is not provided. (See https://learn.microsoft.com/en-us/azure/templates/microsoft.eventgrid/eventsubscriptions?pivots=deployment-language-bicep#eventsubscriptiondestination-objects for more information).')
-param destination object?
+param destination resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.destination?
 
 @description('Optional. The event delivery schema for the event subscription.')
 @allowed([
@@ -32,13 +32,13 @@ param eventDeliverySchema string = 'EventGridSchema'
 param expirationTimeUtc string?
 
 @description('Optional. The filter for the event subscription. (See https://learn.microsoft.com/en-us/azure/templates/microsoft.eventgrid/eventsubscriptions?pivots=deployment-language-bicep#eventsubscriptionfilter for more information).')
-param filter object?
+param filter resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.filter?
 
 @description('Optional. The list of user defined labels.')
 param labels array?
 
 @description('Optional. The retry policy for events. This can be used to configure the TTL and maximum number of delivery attempts and time to live for events.')
-param retryPolicy object?
+param retryPolicy resourceInput<'Microsoft.EventGrid/eventSubscriptions@2025-02-15'>.properties.retryPolicy?
 
 resource systemTopic 'Microsoft.EventGrid/systemTopics@2025-02-15' existing = {
   name: systemTopicName
